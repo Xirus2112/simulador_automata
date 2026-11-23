@@ -6,14 +6,22 @@ Proyecto de **Estructuras Discretas** · `Grupo: 6__`
 - Carlos Calvo
 - Brandon Navarro
 
-El simulador permite construir y modificar un AFD completo desde el navegador. El objetivo es relacionar la definición matemática con la tabla, la gráfica y el recorrido de cada palabra, de modo que los tres integrantes puedan explicar y cambiar el autómata durante la sustentación.
+Simulador de autómatas finitos deterministas (AFD) en Python y Flask. Permite crear y editar autómatas, visualizar sus transiciones, generar palabras reconocidas y probar entradas paso a paso.
+
+**Estado del proyecto.** Este repositorio contiene el prototipo del simulador. La implementación del equipo para la entrega académica está pendiente. El alcance del uso de Codex se detalla en la sección de autoría académica.
 
 ## Instalación y ejecución en Windows
 
-Abra PowerShell. Se verificó con **Python 3.13**. Los requisitos permiten usar Python 3.10 o superior.
+Si va a descargar el proyecto de GitHub, abra PowerShell y ejecute:
 
 ```powershell
-cd "$env:USERPROFILE\Downloads\sw_ed_parcial"
+git clone https://github.com/Xirus2112/simulador_automata.git
+cd simulador_automata
+```
+
+Desde la carpeta del proyecto, ejecute los siguientes comandos. El prototipo se verificó con **Python 3.13** y requiere Python 3.10 o superior.
+
+```powershell
 python --version
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
@@ -109,6 +117,20 @@ Las pruebas cubren A1–A4, transiciones incompletas o inválidas, ε, caractere
 - Preparación y ejecución de las pruebas. [Documentación de pytest](https://docs.pytest.org/en/stable/getting-started.html)
 - Automatización de la revisión en Chrome y de las capturas. [Playwright para Python](https://playwright.dev/python/docs/intro)
 
-## Uso de inteligencia artificial
+## Autoría académica y uso de inteligencia artificial
 
-Se utilizó OpenAI Codex para interpretar el enunciado, proponer la estructura, escribir y revisar código, diseñar la interfaz, preparar y ejecutar pruebas, generar capturas en el navegador y redactar la documentación técnica. Los integrantes deben ejecutar los ejemplos, explicar la lógica y practicar una modificación del AFD antes de la sustentación.
+La sección 10 de la página 9 del enunciado exige que el programa sea obra del equipo. Permite usar IA para entender conceptos y resolver dudas sobre el lenguaje de programación. La lectura de los cinco elementos del AFD, el recorrido de una palabra y la búsqueda de palabras reconocidas deben ser escritos por el equipo. El README debe declarar el uso real de la IA y los tres integrantes deben poder explicar y modificar cualquier parte del programa.
+
+### Uso de Codex en el prototipo
+
+OpenAI Codex ayudó a interpretar el enunciado y escribió código del prototipo, incluida la lógica de los tres apartados indicados arriba. También diseñó y simplificó la interfaz, agregó comentarios en español, preparó y ejecutó las pruebas, generó las capturas y redactó la documentación.
+
+### Reparto propuesto para la versión del equipo
+
+| Responsable | Trabajo previsto | Comprobación |
+| --- | --- | --- |
+| Integrante 1 | Implementar la lectura y validación de Q, Σ, δ, q₀ y F desde el formulario. En el prototipo, esta parte está en [las rutas](routes/main.py) y [el validador](afd/validator.py). | Rechazar un destino fuera de Q y permitir corregir la celda conservando el resto de los datos. |
+| Integrante 2 | Implementar el recorrido y la decisión de aceptación de una palabra. En el prototipo, esta parte está en [el modelo AFD](afd/automata.py). | Con A2, comprobar que `abab` termina en s2, que ε se queda en s0 y que `abc` se detiene en la posición 3. |
+| Integrante 3 | Implementar la búsqueda de hasta cinco palabras por longitud y orden de Σ. En el prototipo, esta parte está en [el generador de palabras](afd/word_generator.py). | Verificar que A2 devuelve `ab`, `aab`, `bab`, `aaab` y `abab`, y que A4 devuelve cero palabras. |
+
+El plan es escribir la versión propia a partir del enunciado y de los casos oficiales. Si se quiere reutilizar la interfaz, las pruebas u otros archivos del prototipo, corresponde consultarlo con el docente. Antes de entregar, cada integrante practicará explicar y modificar una parte escrita por otro. La declaración del README de esa versión debe reflejar lo que se hizo realmente.
