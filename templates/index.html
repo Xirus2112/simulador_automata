@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% from "componentes.html" import definicion %}
+{% block contenido %}
+<div class="encabezado">
+  <h1>Simulador de autómatas finitos</h1>
+</div>
+{% if error %}<p class="mensaje error" role="alert">{{ error }}</p>{% endif %}
+<div class="inicio-grid">
+  <section class="panel">
+    <h2>Autómata activo</h2>
+    {% if activo %}
+      <h3 class="nombre-activo">{{ activo.nombre }}</h3>
+      {{ definicion(activo) }}
+    {% else %}
+      <p>Ninguno. Primero construya un autómata en el Módulo 1.</p>
+    {% endif %}
+    <div class="acciones acciones-inicio">
+      {% if activo %}
+        <a class="boton primario" href="{{ url_for('main.automata') }}">Ver autómata</a>
+        <form method="post" action="{{ url_for('main.editar') }}"><button class="boton" type="submit">Editar autómata actual</button></form>
+      {% endif %}
+      <a class="boton {{ 'secundario' if activo else 'primario' }}" href="{{ url_for('main.nuevo') }}">+ Nuevo autómata</a>
+    </div>
+  </section>
+  <section class="panel">
+    <h2>Cargar un autómata</h2>
+    <form class="carga" method="post" action="{{ url_for('main.cargar_ejemplo') }}">
+      <label for="ejemplo">Ejemplos del curso</label>
+      <div class="entrada-accion">
+        <select id="ejemplo" name="ejemplo" required>
+          <option value="">Seleccione un ejemplo</option>
+          {% for clave, ejemplo in ejemplos.items() %}<option value="{{ clave }}">{{ ejemplo.nombre }}</option>{% endfor %}
+        </select>
+        <button class="boton" type="submit">Cargar</button>
+      </div>
+    </form>
+    <form class="carga" method="post" action="{{ url_for('main.cargar_archivo') }}" enctype="multipart/form-data">
+      <label for="archivo">Archivo de autómata (.json)</label>
+      <div class="entrada-accion">
+        <input type="file" id="archivo" name="archivo" accept=".json,application/json" required>
+        <button class="boton" type="submit">Revisar</button>
+      </div>
+    </form>
+  </section>
+</div>
+<section class="panel modulos" aria-labelledby="titulo-modulos">
+  <h2 id="titulo-modulos">Módulos del simulador</h2>
+  <ol class="lista-modulos">
+    {% for titulo, destino in [
+      ('Construir y visualizar el autómata', 'main.automata' if activo else 'main.nuevo'),
+      ('Mostrar palabras reconocidas', 'main.modulo2'),
+      ('Probar una palabra', 'main.modulo3')
+    ] %}
+      <li><a href="{{ url_for(destino) }}">{{ titulo }}</a></li>
+    {% endfor %}
+  </ol>
+</section>
+{% endblock %}

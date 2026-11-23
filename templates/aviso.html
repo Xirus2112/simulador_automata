@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block titulo %}Aviso{% endblock %}
+{% block contenido %}
+<section class="panel aviso">
+  <h1>Revise el autómata activo</h1>
+  <p role="status">{{ mensaje }}</p>
+  <a class="boton primario" href="{{ url_for('main.nuevo') }}">Ir al Módulo 1</a>
+</section>
+{% endblock %}

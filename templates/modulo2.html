@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% from "componentes.html" import conjunto, recorrido %}
+{% block titulo %}Palabras reconocidas{% endblock %}
+{% block seccion %}Módulo 2 · Lenguaje{% endblock %}
+{% block contenido %}
+<div class="encabezado">
+  <h1>Palabras reconocidas</h1>
+  <p>Orden canónico por longitud y por el orden de Σ = {{ conjunto(afd.alfabeto) }}.</p>
+</div>
+<section class="panel">
+  <div class="panel-cabecera">
+    <h2>Resultados de la búsqueda</h2>
+    <span class="etiqueta">Longitud ≤ 10</span>
+  </div>
+  {% if resultados %}
+    {% if resultados|length < 5 %}
+      <p class="mensaje aviso-color">Este autómata solo reconoce {{ resultados|length }} {{ 'palabra' if resultados|length == 1 else 'palabras' }} de longitud menor o igual que 10.</p>
+    {% endif %}
+    <div class="tabla-scroll">
+      <table class="tabla-palabras">
+        <thead><tr><th scope="col">Palabra</th><th scope="col">Recorrido</th><th scope="col">Estado final</th><th scope="col">Resultado</th></tr></thead>
+        <tbody>
+        {% for resultado in resultados %}
+          <tr>
+            <th scope="row"><code class="palabra">{{ resultado.palabra or 'ε' }}</code></th>
+            <td>{{ recorrido(resultado) }}</td>
+            <td>{{ resultado.estado_actual }}</td>
+            <td><span class="etiqueta exito">✓ Reconocida</span></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="mensaje aviso-color">Este autómata no reconoce ninguna palabra de longitud menor o igual que 10.</p>
+    {% if not afd.estados_finales %}
+      <p>No se definieron estados finales.</p>
+    {% elif not alcanzables|select('in', afd.estados_finales)|list %}
+      <p>Ningún estado final es alcanzable desde el estado inicial.</p>
+      <dl class="definicion dos">
+        <div><dt>Alcanzables desde q₀</dt><dd>{{ conjunto(alcanzables) }}</dd></div>
+        <div><dt>Estados finales</dt><dd>{{ conjunto(afd.estados_finales) }}</dd></div>
+      </dl>
+    {% else %}
+      <p>Hay estados finales alcanzables, pero todos requieren más de 10 transiciones desde q₀.</p>
+    {% endif %}
+  {% endif %}
+</section>
+{% endblock %}

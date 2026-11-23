@@ -1,0 +1,60 @@
+{
+  "A1": {
+    "nombre": "A1 - Número par de ceros",
+    "estados": ["q0", "q1"],
+    "alfabeto": ["0", "1"],
+    "estado_inicial": "q0",
+    "estados_finales": ["q0"],
+    "transiciones": [
+      {"origen": "q0", "simbolo": "0", "destino": "q1"},
+      {"origen": "q0", "simbolo": "1", "destino": "q0"},
+      {"origen": "q1", "simbolo": "0", "destino": "q0"},
+      {"origen": "q1", "simbolo": "1", "destino": "q1"}
+    ]
+  },
+  "A2": {
+    "nombre": "A2 - Termina en ab",
+    "estados": ["s0", "s1", "s2"],
+    "alfabeto": ["a", "b"],
+    "estado_inicial": "s0",
+    "estados_finales": ["s2"],
+    "transiciones": [
+      {"origen": "s0", "simbolo": "a", "destino": "s1"},
+      {"origen": "s0", "simbolo": "b", "destino": "s0"},
+      {"origen": "s1", "simbolo": "a", "destino": "s1"},
+      {"origen": "s1", "simbolo": "b", "destino": "s2"},
+      {"origen": "s2", "simbolo": "a", "destino": "s1"},
+      {"origen": "s2", "simbolo": "b", "destino": "s0"}
+    ]
+  },
+  "A3": {
+    "nombre": "A3 - Solo ab y ba",
+    "estados": ["p0", "p1", "p2", "p3", "m"],
+    "alfabeto": ["a", "b"],
+    "estado_inicial": "p0",
+    "estados_finales": ["p3"],
+    "transiciones": [
+      {"origen": "p0", "simbolo": "a", "destino": "p1"},
+      {"origen": "p0", "simbolo": "b", "destino": "p2"},
+      {"origen": "p1", "simbolo": "a", "destino": "m"},
+      {"origen": "p1", "simbolo": "b", "destino": "p3"},
+      {"origen": "p2", "simbolo": "a", "destino": "p3"},
+      {"origen": "p2", "simbolo": "b", "destino": "m"},
+      {"origen": "p3", "simbolo": "a", "destino": "m"},
+      {"origen": "p3", "simbolo": "b", "destino": "m"},
+      {"origen": "m", "simbolo": "a", "destino": "m"},
+      {"origen": "m", "simbolo": "b", "destino": "m"}
+    ]
+  },
+  "A4": {
+    "nombre": "A4 - Ninguna palabra",
+    "estados": ["q0", "q1"],
+    "alfabeto": ["a"],
+    "estado_inicial": "q0",
+    "estados_finales": ["q1"],
+    "transiciones": [
+      {"origen": "q0", "simbolo": "a", "destino": "q0"},
+      {"origen": "q1", "simbolo": "a", "destino": "q1"}
+    ]
+  }
+}

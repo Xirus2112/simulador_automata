@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Inicio{% endblock %} · Simulador AFD</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  {% block scripts %}{% endblock %}
+  <script defer src="{{ url_for('static', filename='js/app.js') }}"></script>
+</head>
+<body>
+  <a class="salto" href="#contenido">Ir al contenido</a>
+  {% set ruta = request.endpoint %}
+  <header class="cabecera-sitio">
+    <div class="contenedor cabecera-interior">
+      <a class="marca" href="{{ url_for('main.inicio') }}">Simulador AFD</a>
+      <nav aria-label="Navegación principal">
+        <a class="nav-link" {% if ruta == 'main.inicio' %}aria-current="page"{% endif %} href="{{ url_for('main.inicio') }}">Inicio</a>
+        <a class="nav-link" {% if ruta in ['main.nuevo', 'main.construir', 'main.automata'] %}aria-current="page"{% endif %}
+           href="{{ url_for('main.automata' if activo else 'main.nuevo') }}">Construir y visualizar</a>
+        <a class="nav-link" {% if ruta == 'main.modulo2' %}aria-current="page"{% endif %} href="{{ url_for('main.modulo2') }}">Palabras reconocidas</a>
+        <a class="nav-link" {% if ruta == 'main.modulo3' %}aria-current="page"{% endif %} href="{{ url_for('main.modulo3') }}">Probar una palabra</a>
+      </nav>
+    </div>
+  </header>
+  <div class="contenedor">
+    <div class="barra">
+      <span>{% block seccion %}Estructuras Discretas{% endblock %}</span>
+      <a class="estado-global{% if activo %} cargado{% endif %}" href="{{ url_for('main.automata') }}">
+        {% if activo %}AFD activo · {{ activo.nombre }}{% else %}Sin autómata activo{% endif %}
+      </a>
+    </div>
+    <main class="contenido" id="contenido">
+      {% block contenido %}{% endblock %}
+    </main>
+  </div>
+</body>
+</html>

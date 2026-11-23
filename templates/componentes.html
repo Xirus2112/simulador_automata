@@ -1,0 +1,46 @@
+{% macro conjunto(elementos) -%}
+  {{ '{' ~ (elementos|join(', ')) ~ '}' if elementos else '∅' }}
+{%- endmacro %}
+
+{% macro definicion(afd) %}
+  <p class="tupla">M = ({{ conjunto(afd.estados) }}, {{ conjunto(afd.alfabeto) }}, δ, {{ afd.estado_inicial }}, {{ conjunto(afd.estados_finales) }})</p>
+  <dl class="definicion">
+    <div><dt>Q · Estados</dt><dd>{{ conjunto(afd.estados) }}</dd></div>
+    <div><dt>Σ · Alfabeto</dt><dd>{{ conjunto(afd.alfabeto) }}</dd></div>
+    <div><dt>q₀ · Inicial</dt><dd>{{ afd.estado_inicial }}</dd></div>
+    <div><dt>F · Finales</dt><dd>{{ conjunto(afd.estados_finales) }}</dd></div>
+  </dl>
+{% endmacro %}
+
+{% macro tabla(afd) %}
+  <div class="tabla-scroll">
+    <table>
+      <thead><tr><th scope="col">Estado</th>{% for simbolo in afd.alfabeto %}<th scope="col">{{ simbolo }}</th>{% endfor %}</tr></thead>
+      <tbody>
+        {% for estado in afd.estados %}
+        <tr>
+          <th scope="row"><span class="marcas">{{ '→' if estado == afd.estado_inicial else '' }}{{ '*' if estado in afd.estados_finales else '' }}</span>{{ estado }}</th>
+          {% for simbolo in afd.alfabeto %}<td>{{ afd.transiciones[(estado, simbolo)] }}</td>{% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endmacro %}
+
+{% macro grafica(dot, resaltada=false) %}
+  <div class="grafica" data-grafica role="img" aria-label="{{ 'Diagrama del AFD con el recorrido numerado' if resaltada else 'Diagrama de estados del AFD' }}">
+    <template>{{ dot }}</template>
+    <p class="estado-grafica" role="status">Preparando diagrama…</p>
+    <noscript><p>Active JavaScript para ver el diagrama.</p></noscript>
+  </div>
+{% endmacro %}
+
+{% macro recorrido(resultado) %}
+  <span class="recorrido">
+    <span class="nodo">{{ resultado.recorrido[0] }}</span>
+    {% for origen, simbolo, destino in resultado.pasos %}
+      <span class="salto-estado"><span class="flecha"><span>{{ simbolo }}</span><span>→</span></span><span class="nodo">{{ destino }}</span></span>
+    {% endfor %}
+  </span>
+{% endmacro %}

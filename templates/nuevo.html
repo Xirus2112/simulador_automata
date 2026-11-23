@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block titulo %}Nuevo autómata{% endblock %}
+{% block seccion %}Módulo 1{% endblock %}
+{% block contenido %}
+<section class="panel aviso">
+  <h1>¿Desea crear un nuevo autómata?</h1>
+  <p>Cuando lo active, el nuevo autómata reemplazará a {{ activo.nombre }}.</p>
+  <div class="acciones">
+    <a class="boton" href="{{ url_for('main.automata') }}">Cancelar</a>
+    <form method="post"><button class="boton primario" type="submit">Continuar</button></form>
+  </div>
+</section>
+{% endblock %}

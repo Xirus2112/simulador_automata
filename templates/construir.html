@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% from "componentes.html" import definicion, tabla %}
+{% block titulo %}{{ pasos[paso - 1] }}{% endblock %}
+{% block seccion %}Módulo 1 · Asistente{% endblock %}
+{% block contenido %}
+<div class="encabezado">
+  <h1>{{ 'Editar autómata actual' if datos.modo == 'edición' else 'Revisar autómata importado' if datos.modo == 'archivo' else 'Construir autómata' }}</h1>
+  <p>Complete la definición del AFD en el orden de la 5-tupla.</p>
+</div>
+<ol class="pasos" aria-label="Pasos del asistente">
+  {% for etiqueta in pasos %}
+    <li {% if loop.index == paso %}aria-current="step"{% endif %} class="{{ 'listo' if loop.index < paso else '' }}">
+      {% if loop.index < paso %}
+        <a href="{{ url_for('main.construir', paso=loop.index) }}"><b>{{ loop.index }}</b>{{ etiqueta }}</a>
+      {% else %}
+        <span><b>{{ loop.index }}</b>{{ etiqueta }}</span>
+      {% endif %}
+    </li>
+  {% endfor %}
+</ol>
+<section class="panel asistente">
+  <div class="panel-cabecera"><h2>{{ pasos[paso - 1] }}</h2><span class="etiqueta">Paso {{ paso }} de {{ pasos|length }}</span></div>
+  {% if error %}<p class="mensaje error" role="alert">{{ error }}</p>{% endif %}
+  <form id="formulario-paso" method="post">
+    {% if paso == 1 %}
+      <label for="nombre">Nombre del autómata</label>
+      <input type="text" id="nombre" name="nombre" value="{{ entradas.get('texto', datos.nombre) }}" placeholder="AFD que termina en ab" autofocus>
+    {% elif paso == 2 %}
+      <label for="estados">Estados de Q</label>
+      <input type="text" id="estados" name="estados" value="{{ entradas.get('texto', datos.estados|join(', ')) }}" placeholder="s0, s1, s2" aria-describedby="ayuda" autofocus>
+      <p class="ayuda" id="ayuda">Separe los nombres con comas. Cada nombre debe ser único y escribirse sin espacios internos.</p>
+    {% elif paso == 3 %}
+      <label for="alfabeto">Símbolos de Σ</label>
+      <input type="text" id="alfabeto" name="alfabeto" value="{{ entradas.get('texto', datos.alfabeto|join(', ')) }}" placeholder="a, b" aria-describedby="ayuda" autofocus>
+      <p class="ayuda" id="ayuda">Separe con comas los símbolos de un carácter. El orden de entrada se usa en el Módulo 2. ε representa la palabra vacía.</p>
+    {% elif paso == 4 %}
+      <p class="ayuda">Escriba un destino de Q para cada celda. Las celdas pendientes aparecen en ámbar.</p>
+      {% set transiciones = entradas.get('transiciones', datos.transiciones) %}
+      {# El mismo datalist sirve para todas las celdas de la tabla. #}
+      <datalist id="destinos">{% for estado in datos.estados %}<option value="{{ estado }}">{% endfor %}</datalist>
+      <div class="tabla-scroll">
+        <table class="tabla-editor">
+          <thead><tr><th scope="col">Origen</th>{% for simbolo in datos.alfabeto %}<th scope="col">{{ simbolo }}</th>{% endfor %}</tr></thead>
+          <tbody>
+          {% for estado in datos.estados %}
+            {% set fila = loop.index0 %}
+            <tr><th scope="row">{{ estado }}</th>
+            {% for simbolo in datos.alfabeto %}
+              {% set destino = transiciones.get((estado, simbolo), '') %}
+              <td><input type="text" name="delta_{{ fila }}_{{ loop.index0 }}" value="{{ destino }}"
+                class="{{ 'pendiente' if not destino else '' }}" list="destinos" placeholder="Destino"
+                aria-label="δ({{ estado }}, {{ simbolo }})"
+                {% if error and destino not in datos.estados %}aria-invalid="true"{% endif %}></td>
+            {% endfor %}
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% elif paso == 5 %}
+      {% if datos.revisar_inicial %}<p class="mensaje aviso-color">El estado inicial anterior fue eliminado de Q. Seleccione uno de los estados disponibles.</p>{% endif %}
+      <label for="inicial">Estado inicial q₀</label>
+      <select id="inicial" name="inicial" autofocus>
+        <option value="">Seleccione un estado</option>
+        {% for estado in datos.estados %}
+          <option value="{{ estado }}" {% if estado == entradas.get('inicial', datos.inicial) %}selected{% endif %}>{{ estado }}</option>
+        {% endfor %}
+      </select>
+    {% elif paso == 6 %}
+      {% if datos.finales_eliminados %}<p class="mensaje aviso-color">Se eliminaron de Q los estados finales {{ datos.finales_eliminados|join(', ') }}. Revise la selección de F.</p>{% endif %}
+      {% set finales = entradas.get('finales', datos.finales) %}
+      <fieldset data-finales>
+        <legend>Seleccione los estados de aceptación</legend>
+        <div class="checks">
+          {% for estado in datos.estados %}
+            <label><input type="checkbox" name="finales" value="{{ estado }}" {% if estado in finales %}checked{% endif %}> {{ estado }}</label>
+          {% endfor %}
+        </div>
+        <p class="mensaje aviso-color" data-aviso-finales {% if finales %}hidden{% endif %}>No se han definido estados finales. Este autómata no reconocerá ninguna palabra.</p>
+      </fieldset>
+    {% elif resumen %}
+      <h3>{{ resumen.nombre }}</h3>
+      {{ definicion(resumen) }}
+      {{ tabla(resumen) }}
+      {% if not resumen.estados_finales %}<p class="mensaje aviso-color">No se han definido estados finales. Este autómata no reconocerá ninguna palabra.</p>{% endif %}
+      {% if activo %}<p class="ayuda resumen-ayuda">Al activarlo, se reemplazará a {{ activo.nombre }}.</p>{% endif %}
+    {% endif %}
+    <div class="acciones pie-asistente">
+      {% if paso > 1 %}<a class="boton" href="{{ url_for('main.construir', paso=paso-1) }}">Anterior</a>{% endif %}
+      <button class="boton secundario" type="submit" form="cancelar-asistente">Cancelar</button>
+      {% if paso < pasos|length or resumen %}
+        <button class="boton primario" type="submit">{{ 'Activar autómata' if resumen else 'Continuar' }}</button>
+      {% endif %}
+    </div>
+  </form>
+  <form id="cancelar-asistente" method="post" action="{{ url_for('main.cancelar') }}"></form>
+</section>
+{% endblock %}

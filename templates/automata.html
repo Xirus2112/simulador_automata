@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% from "componentes.html" import conjunto, definicion, tabla, grafica %}
+{% block titulo %}Autómata activo{% endblock %}
+{% block seccion %}Módulo 1 · Construir y visualizar{% endblock %}
+{% block scripts %}<script defer src="{{ url_for('static', filename='js/vendor/viz-global.js') }}"></script>{% endblock %}
+{% block contenido %}
+<div class="encabezado encabezado-acciones">
+  <div><h1>{{ afd.nombre }}</h1><p>Definición formal y gráfica del autómata activo.</p></div>
+  <div class="acciones">
+    <form method="post" action="{{ url_for('main.editar') }}"><button class="boton" type="submit">Editar autómata actual</button></form>
+    <a class="boton primario" href="{{ url_for('main.nuevo') }}">+ Nuevo autómata</a>
+  </div>
+</div>
+<section class="panel formal">
+  <div class="panel-cabecera">
+    <h2>Definición formal</h2>
+    <a class="enlace" href="{{ url_for('main.descargar') }}">Descargar AFD (.json)</a>
+  </div>
+  {{ definicion(afd) }}
+</section>
+<div class="detalle-grid">
+  <section class="panel">
+    <h2>Tabla de transiciones δ</h2>
+    {{ tabla(afd) }}
+    <p class="ayuda leyenda">→ Estado inicial <span>·</span> * Estado final</p>
+  </section>
+  <section class="panel">
+    <h2>Diagrama de estados</h2>
+    {{ grafica(dot) }}
+    <p class="ayuda leyenda">Alcanzables desde q₀ <strong>{{ conjunto(alcanzables) }}</strong></p>
+  </section>
+</div>
+{% endblock %}

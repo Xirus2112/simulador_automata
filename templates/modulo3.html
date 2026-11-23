@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% from "componentes.html" import conjunto, grafica, recorrido %}
+{% block titulo %}Probar una palabra{% endblock %}
+{% block seccion %}Módulo 3 · Reconocimiento{% endblock %}
+{% block scripts %}{% if dot %}<script defer src="{{ url_for('static', filename='js/vendor/viz-global.js') }}"></script>{% endif %}{% endblock %}
+{% block contenido %}
+<div class="encabezado">
+  <h1>Probar una palabra</h1>
+  <p>Alfabeto del autómata activo <strong>Σ = {{ conjunto(afd.alfabeto) }}</strong></p>
+</div>
+<section class="panel prueba">
+  <form method="post" action="{{ url_for('main.modulo3') }}">
+    <label for="palabra">Palabra</label>
+    <div class="entrada-accion">
+      <input type="text" id="palabra" name="palabra" autocomplete="off" spellcheck="false" autocapitalize="off" autofocus aria-describedby="ayuda-palabra">
+      <button class="boton primario" type="submit">Procesar palabra</button>
+    </div>
+    <p id="ayuda-palabra" class="ayuda">Deje el campo vacío para probar ε.</p>
+  </form>
+</section>
+{% if resultado %}
+<div class="prueba-grid">
+  <section class="panel">
+    <div class="panel-cabecera resultado-cabecera">
+      <h2>Resultado para <code class="palabra">{{ resultado.palabra or 'ε' }}</code></h2>
+      <span class="etiqueta {{ 'exito' if resultado.aceptada else 'negativo' }}">
+        {{ '✓ Palabra reconocida' if resultado.aceptada else '✗ Palabra no reconocida' }}
+      </span>
+    </div>
+    {% if resultado.simbolo_invalido is not none %}
+      <p class="mensaje error">El símbolo «{{ resultado.simbolo_invalido }}»{% if resultado.simbolo_invalido == ' ' %} (espacio){% endif %}, ubicado en la posición {{ resultado.posicion_invalida }}, no pertenece al alfabeto Σ = {{ conjunto(afd.alfabeto) }}.</p>
+      <h3>Recorrido hasta el símbolo inválido</h3>
+    {% else %}
+      <h3>Recorrido de estados</h3>
+    {% endif %}
+    {{ recorrido(resultado) }}
+    {% if resultado.simbolo_invalido is none %}
+      <p class="estado-final">Estado al terminar <strong>{{ resultado.estado_actual }}</strong>
+        <span class="ayuda">· {{ resultado.estado_actual }} {{ 'pertenece' if resultado.aceptada else 'no pertenece' }} a F.</span>
+      </p>
+      <details class="pasos-palabra">
+        <summary>Ver las transiciones paso a paso</summary>
+        {% if resultado.pasos %}
+          <ol>{% for origen, simbolo, destino in resultado.pasos %}<li>δ({{ origen }}, {{ simbolo }}) = {{ destino }}</li>{% endfor %}</ol>
+        {% else %}
+          <p>ε deja al autómata en el estado inicial sin aplicar transiciones.</p>
+        {% endif %}
+      </details>
+    {% endif %}
+  </section>
+  {% if dot %}
+  <section class="panel panel-recorrido">
+    <h2>Recorrido en la gráfica</h2>
+    {{ grafica(dot, true) }}
+  </section>
+  {% endif %}
+</div>
+{% endif %}
+{% if historial %}
+<section class="panel historial">
+  <div class="panel-cabecera"><h2>Historial de palabras</h2><span class="etiqueta">{{ historial|length }} {{ 'prueba' if historial|length == 1 else 'pruebas' }}</span></div>
+  <ul class="lista-historial">
+    {% for intento in historial|reverse %}
+      <li><code class="palabra">{{ intento.palabra or 'ε' }}</code><span class="etiqueta {{ 'exito' if intento.aceptada else 'negativo' }}">{{ '✓ Reconocida' if intento.aceptada else '✗ No reconocida' }}</span></li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+{% endblock %}
